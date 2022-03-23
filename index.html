@@ -1,13 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>HTML 5 Boilerplate</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-	<script src="index.js"></script>
-  </body>
+    <title>online-radio</title>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div id="app">
+    <div class="grid grid-cols-12 gap-4 mx-20 my-5">
+        <div v-if="activeSource" class="col-span-12 rounded overflow-hidden shadow-lg">
+            <div class="px-6 py-4">
+                <div class="font-bold text-xl mb-2">{{activeSource.name}}</div>
+            </div>
+            
+            <button @click="play()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4">play</button>
+            <button @click="pause()" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-4">pause</button>
+            <button @click="stop()" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-4">stop</button>
+
+            <input type="range"
+                   v-model="activeVolume"
+                   id="volume"
+                   name="volume"
+                   min="0"
+                   max="1"
+                   step="0.2"
+                   class="bg-orange-100 form-range appearance-none h-6 p-2 rounded">
+        </div>
+
+        <div class="col-span-6 col-start-3">
+            <button v-for="radio in availableSources" @click="activeSource = radio" class="bg-blue-500 hover:bg-blue-700 w-full text-white font-bold py-2 px-4 rounded block mb-4">{{radio.name}}</button>
+        </div>
+    </div>
+    <audio v-if="activeSource" ref="player" :src="activeSource.url"></audio>
+</div>
+
+<script>
+    Vue.createApp({
+        data() {
+            return {
+                activeVolume: 0.5,
+                activeSource: null,
+                availableSources: [
+                    {
+                        name: 'radioswh',
+                        url: 'https://live.radioswh.lv:8443/swhmp3'
+                    },
+                    {
+                        name: 'radioswh-rock',
+                        url: 'https://live.radioswh.lv:8443/rockmp3'
+                    },
+                    {
+                        name: 'radio1',
+                        url: 'http://31.170.16.6:8000/;stream.mp3'
+                    },
+                ],
+            }
+        },
+        watch: {
+            activeVolume(newValue, oldValue) {
+                this.$refs.player.volume = newValue
+            }
+        },
+        mounted() {
+            this.activeSource = this.availableSources[0];
+        },
+        methods: {
+            play() {
+                this.$refs.player.play();
+            },
+            pause() {
+                this.$refs.player.pause();
+            },
+            stop() {
+                this.$refs.player.pause();
+                this.$refs.player.currentTime = 0;
+            }
+        }
+    }).mount('#app')
+</script>
+</body>
 </html>
