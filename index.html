@@ -9,30 +9,54 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
+<!--layout-->
 <div id="app">
-    <div class="grid grid-cols-12 gap-4 mx-20 my-5">
-        <div v-if="activeSource" class="col-span-12 rounded overflow-hidden shadow-lg">
-            <div class="px-6 py-4">
-                <div class="font-bold text-xl mb-2">{{activeSource.name}}</div>
+    <div class="bg-purple-500 md:bg-green-400 sm:bg-blue-400 lg:bg-red-400 py-1"></div>
+    <div class="grid grid-cols-6 lg:grid-cols-12 gap-2 lg:mx-48 md:mx-48 sm:mx-32 mx-2 my-2">
+        <div class="col-span-6 lg:col-span-4 lg:col-start-4 flex">
+            <button @click="play()" class="flex-1 bg-green-500 hover:bg-green-700 text-white font-bold px-4 border-b-4 border-green-900 rounded">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+            <button @click="pause()" class="flex-1 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 border-b-4 border-yellow-900 rounded">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+            <button @click="stop()" class="flex-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border-b-4 border-red-900 rounded">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                </svg>
+            </button>
+        </div>
+        <div class="col-span-6 lg:col-span-4 lg:col-start-4">
+            <input type="range" v-model="activeVolume" id="volume"
+                   name="volume" min="0" max="1" step="0.1"
+                   class="shadow-inner w-full h-2 bg-gray-900 appearance-none" />
+        </div>
+        <div v-if="activeSource" class="bg-gray-100 col-span-6 rounded shadow-inner lg:col-span-4 lg:col-start-4 ">
+            <div class="p-2 grid place-items-center">
+                <span class="animate-pulse text-xl text-gray-800 font-bold">{{activeSource.name}}</span>
             </div>
-            
-            <button @click="play()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4">play</button>
-            <button @click="pause()" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-4">pause</button>
-            <button @click="stop()" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-4">stop</button>
-
-            <input type="range"
-                   v-model="activeVolume"
-                   id="volume"
-                   name="volume"
-                   min="0"
-                   max="1"
-                   step="0.2"
-                   class="bg-orange-100 form-range appearance-none h-6 p-2 rounded">
+        </div>
+        <div v-if="activeSource" class="col-span-6 p-5 shadow-inner rounded bg-gray-100 lg:col-span-4 lg:col-start-4 ">
+            <div class="col-span-6 col-start-3">
+                <button v-for="radio in availableSources" @click="changeStation(radio)"
+                        class="bg-gray-800 hover:bg-gray-800 transition ease-in-out delay-150 bg-gray-500 hover:-translate-y-1 hover:scale-105 duration-150 w-full text-white font-bold py-2 px-4 rounded block mb-2">
+                    {{radio.name}}
+                </button>
+            </div>
         </div>
 
-        <div class="col-span-6 col-start-3">
-            <button v-for="radio in availableSources" @click="activeSource = radio" class="bg-blue-500 hover:bg-blue-700 w-full text-white font-bold py-2 px-4 rounded block mb-4">{{radio.name}}</button>
-        </div>
+
+
+
+
+
+
     </div>
     <audio v-if="activeSource" ref="player" :src="activeSource.url"></audio>
 </div>
@@ -41,34 +65,38 @@
     Vue.createApp({
         data() {
             return {
-                activeVolume: 0.5,
+                activeVolume: 0.2,
                 activeSource: null,
                 availableSources: [
                     {
-                        name: 'radioswh',
+                        name: 'SWH',
                         url: 'https://live.radioswh.lv:8443/swhmp3'
                     },
                     {
-                        name: 'radioswh-rock',
+                        name: 'SWH Rock',
                         url: 'https://live.radioswh.lv:8443/rockmp3'
                     },
                     {
                         name: 'pieci.lv',
-                        url: 'https://live.pieci.lv/live19-hq.mp3'
+                        url: 'http://live.pieci.lv/live19-hq.mp3'
                     },
                 ],
             }
         },
         watch: {
             activeVolume(newValue, oldValue) {
-                this.$refs.player.volume = newValue
+                this.$refs.player.volume = newValue;
             }
         },
         mounted() {
             this.activeSource = this.availableSources[0];
         },
         methods: {
+            changeStation(radio) {
+                this.activeSource = radio;
+            },
             play() {
+                this.$refs.player.volume = this.activeVolume;
                 this.$refs.player.play();
             },
             pause() {
@@ -77,9 +105,14 @@
             stop() {
                 this.$refs.player.pause();
                 this.$refs.player.currentTime = 0;
-            }
+            },
         }
     }).mount('#app')
 </script>
+<style>
+    svg {
+        filter: drop-shadow(2px 2px 2px rgb(0 0 0 / 0.6));
+    }
+</style>
 </body>
 </html>
